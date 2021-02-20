@@ -11,19 +11,25 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.layout.BorderPane;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class MainView {
 
+    LocalDateTime dateTime = LocalDateTime.now(); // Gets the current date and time
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     TextField firstNameTextField = new TextField(" ");
     TextField lastNameTextField = new TextField(" ");
     TextField idTextField = new TextField(" ");
     TextField phoneNumberTextField = new TextField(" ");
     Boolean isListValid = false;
+    Boolean lastEntrySaved = true;  // as a contact been added but not saved?
 
     public Scene initScene(Main main, Controller controller){
-        Contact contact = new Contact();
-        ObservableList<String> items = FXCollections.observableArrayList (
-                "People", "in", "the", "Application");
-
+        // Contact contact = new Contact();    // used to add/remove
+        // list is the list of the elements for the ListView, as such it must be initialised before
+        // before being passed on for the creation of the add/remove/list buttons
+        ObservableList<String> list = FXCollections.observableArrayList ("People", "in", "the", "Application");
 
         // setting the different parts of the scene for the stage
         // the scene will be a BorderPane
@@ -40,19 +46,20 @@ public class MainView {
         secondRow = setupTextEntries();             // calling a method for clarity of reading
         // 3rd row: HBox (for the add/remove/list buttons)
         HBox thirdRow = new HBox();
-        thirdRow = setupPrimaryButtons(contact, items, controller);
+        thirdRow = setupPrimaryButtons(list, controller);
         // top of BorderPane
         VBox topVBox = new VBox();
         topVBox.getChildren().addAll(firstRow,secondRow,thirdRow);
 
         // 4th row: List - center of BorderPane
         ListView<String> fourthRow = new ListView<String>();
-        items = FXCollections.observableArrayList (
-                "People", "in", "the", "Application");
+//        list = FXCollections.observableArrayList (
+//                "People", "in", "the", "Application");
 //        items.addListener(e -> {
 //
 //        });
-        fourthRow.setItems(items);
+        list.addListener( (ListChangeListener<String>) change -> fourthRow.setItems(list));
+        fourthRow.setItems(list);
 
         // A SUIVRE
 
@@ -103,44 +110,52 @@ public class MainView {
         return secondRow;
     }
 
-    private HBox setupPrimaryButtons(Contact contact, ObservableList<String> items, Controller controller){
+    private HBox setupPrimaryButtons(ObservableList<String> list, Controller controller){
         Button addButton = new Button("ADD");
         Button removeButton = new Button("Remove");
         Button listButton = new Button("List");
+        Contact contact = new Contact();
+
         ObservableList<String> temp = FXCollections.observableArrayList() ;
         addButton.setOnAction(e -> {
-            if (controller.contactExist(contact.getId())){
-                // cant add
-                Alert error = new Alert(Alert.AlertType.ERROR);
-                error.setContentText("Contact already exist.");
-                error.show();
-            }
-            else {
-                if (isListValid){
-                    items.removeAll();
-                    controller.getList(items);
-                }
-                contact.setFirstName(firstNameTextField.getText());
-                contact.setLastName(lastNameTextField.getText());
-                contact.setId(idTextField.getText());
-                contact.setPhoneNumber(phoneNumberTextField.getText());
+            showMeContact(contact);
+            contact.setFirstName(firstNameTextField.getText());
+            contact.setLastName(lastNameTextField.getText());
+            contact.setId(idTextField.getText());
+            contact.setPhoneNumber(phoneNumberTextField.getText());
+            if (controller.addContact(contact)){
+                lastEntrySaved = false;     // an new contact is being added therefore is not saved
+                list.clear();
+                list.add("["+dateTime.format(formatter)+"] Contact added: "+contact.toString());
+
                 firstNameTextField.clear();
                 lastNameTextField.clear();
                 idTextField.clear();
                 phoneNumberTextField.clear();
-
-                items.add(contact.toString());
-                showMeItems(items);
-                controller.addContact(contact);
+            }
+            else {                // cant add
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setContentText("Contact already exist.");
+                error.show();
             }
         });
+
         removeButton.setOnAction(e -> {
+
             // items.remove
 //            Alert error = new Alert(Alert.AlertType.ERROR);
 //            error.setContentText("Contact is not the list.");
 //            error.show();
+            // else {
+            //      lastEntrySaved = false; // the list has changed but has not been saved
+            // }
         });
         // A SUIVRE
+        listButton.setOnAction(e -> {
+            list.clear();
+            controller.getList(list);
+
+        });
 
         HBox thirdRow = new HBox(10,addButton, removeButton, listButton);
         thirdRow.setSpacing(5);
@@ -158,6 +173,14 @@ public class MainView {
         rightHBox.setSpacing(5);
 
         // A SUIVRE
+        // Save first? => lastEntrySaved == true;
+        exitButton.setOnAction(e -> {
+            Alert exit = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?");
+            exit.showAndWait()
+                .filter(choice -> choice == ButtonType.OK)
+                .ifPresent(choice -> System.exit(0));
+        });
+        // A SUIVRE
 
         BorderPane.setAlignment(leftHBox,Pos.CENTER_LEFT);
         BorderPane.setAlignment(rightHBox,Pos.CENTER_RIGHT);
@@ -170,7 +193,11 @@ public class MainView {
 
     void showMeItems(ObservableList<String> items){
         for (Object o : items){
-            System.out.println(o.toString());
+            System.out.println("sMI "+ o.toString());
         }
+    }
+
+    void showMeContact(Contact c){
+        System.out.println("sMC "+c.toString());
     }
 }

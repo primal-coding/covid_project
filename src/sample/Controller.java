@@ -5,24 +5,35 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 
 public class Controller {
-    ArrayList <Contact> contacts = new ArrayList<Contact>();
+    private ArrayList <Contact> contacts = new ArrayList<Contact>();
 
-    void addContact(Contact contact){
-        // check for duplicates first
-        contacts.add(contact);
+    boolean addContact(Contact contact){
+        Contact c = new Contact(contact.getFirstName(), contact.getLastName(), contact.getId(), contact.getPhoneNumber());
+        if (contactExist(c.getId()))
+            return false;   // contact exist => NOT added (false)
+        contacts.add(c);
+        return true;        // true => contact added
     }
 
-    boolean contactExist(String id){
-        for (Contact contact : contacts){
-            if (contact.getId() == id)
+    private boolean contactExist(String id){
+        if (contacts.isEmpty()){
+            return false;
+        }
+        for (Contact c : contacts){
+            System.out.println("-> " + c.toString() + "<- id: " + id);
+            if (id.equals(c.getId())) {
+                // System.out.println("<- " + c.toString());
                 return true;
+            }
         }
         return false;
     }
 
     void getList(ObservableList<String> items){
         for (Contact c : contacts){
-            items.add(contacts.toString());
+            items.add(c.toString());
+            System.out.println("GL-> " + c.toString());
         }
+
     }
 }
