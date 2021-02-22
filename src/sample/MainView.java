@@ -16,10 +16,10 @@ import java.time.format.DateTimeFormatter;
 public class MainView {
 
     // TextFields are used in global class to make it simpler and clearer in the setting up of the scene
-    TextField firstNameTextField = new TextField(" ");
-    TextField lastNameTextField = new TextField(" ");
-    TextField idTextField = new TextField(" ");
-    TextField phoneNumberTextField = new TextField(" ");
+    TextField firstNameTextField = new TextField("");
+    TextField lastNameTextField = new TextField("");
+    TextField idTextField = new TextField("");
+    TextField phoneNumberTextField = new TextField("");
     Boolean isListValid = false;
     Boolean lastEntrySaved = true;  // as a contact been added but not saved?
 
@@ -71,6 +71,9 @@ public class MainView {
         mainPane.setCenter(fourthRow);
         mainPane.setBottom(fifthRow);
         Scene root = new Scene(mainPane, 550, 550);
+
+        loadOnStart(list, controller);      // automatic load of list of contacts
+
         return root;
     }
 
@@ -216,6 +219,14 @@ public class MainView {
                 exit.showAndWait()
                         .filter(choice -> choice == ButtonType.OK)
                         .ifPresent(choice -> {
+                            System.exit(0);
+                        });
+            }
+            else {     // one (or more) contact has been added or removed since the last save:
+                Alert exit = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to save the list of contacts?");
+                exit.showAndWait()
+                        .filter(choice -> choice == ButtonType.OK)
+                        .ifPresent(choice -> {
                             boolean success = controller.saveList();
                             if (!success){
                                 list.clear();       // clear then update of the ListView for feedback to the user
@@ -230,12 +241,6 @@ public class MainView {
                             System.exit(0);
                         });
             }
-            else {     // one (or more) contact has been added or removed since the last save:
-                Alert exit = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to save the list of contacts?");
-                exit.showAndWait()
-                        .filter(choice -> choice == ButtonType.OK)
-                        .ifPresent(choice -> System.exit(0));
-            }
         });
 
         BorderPane.setAlignment(leftHBox,Pos.CENTER_LEFT);
@@ -248,7 +253,17 @@ public class MainView {
     }
 
 
-
+    void loadOnStart(ObservableList<String> list, Controller controller){
+        boolean success = controller.loadList();
+        if (!success){
+            list.clear();       // clear then update of the ListView for feedback to the user
+            list.add("Error: the list of contacts couldn't be loaded");
+        }
+        else {
+            list.clear();       // clear then update of the ListView for feedback to the user
+            list.add("The list of contacts has been loaded");
+        }
+    }
 
     // for personal use and future reference:
     //    LocalDateTime dateTime = LocalDateTime.now(); // Gets the current date and time

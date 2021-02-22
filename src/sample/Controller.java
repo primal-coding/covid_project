@@ -38,7 +38,8 @@ public class Controller {
         int index= -1;
         if (contactExist(contact.getId())){
             for (Contact c : contacts){
-                if ((c.getId()).equals(contact.getId())){     // contact found
+                System.out.println(c.getId() +"-"+contact.getId()+"\n");
+                if (c.getId().equals(contact.getId())){     // contact found
                     contacts.remove(c);
                     return true;
                 }
@@ -60,7 +61,9 @@ public class Controller {
     boolean loadList(){
         Boolean success;
         SaveNLoader load = new SaveNLoader();
-        success = load.load(contacts);
+        success = load.load();
+        if (success)
+            contacts = load.getList();
         System.out.println("load contacts 2 ok " + contacts.toString() + " " + success);
         return success;
     }

@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class SaveNLoader {
-
+        ArrayList<Contact> contacts =new ArrayList<Contact>();
 //    public SaveNLoader (){
 //        // create the file to load and save for the first time
 //        File file = new File("listOfContacts.loc");
@@ -26,7 +26,6 @@ public class SaveNLoader {
 
     boolean save(ArrayList<Contact> contacts) {
         boolean success = true;
-        Contact c = new Contact();
         try{
             FileOutputStream file = new FileOutputStream(new File("listOfContacts.loc"));
             ObjectOutputStream ooStream = new ObjectOutputStream(file);
@@ -52,8 +51,8 @@ public class SaveNLoader {
         return success;
     }
 
-    boolean load(ArrayList<Contact> contacts){
-        boolean success = true;Contact c = new Contact();
+    boolean load(){
+        boolean success = true;
         try{
             FileInputStream file = new FileInputStream(new File("listOfContacts.loc"));
             ObjectInputStream oiStream = new ObjectInputStream(file);
@@ -75,7 +74,9 @@ public class SaveNLoader {
             success = false;
         }
         return success;
-
     }
 
+    ArrayList<Contact> getList(){
+        return this.contacts;
+    }
 }
