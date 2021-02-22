@@ -35,8 +35,16 @@ public class Controller {
     }
 
     boolean removeContact(Contact contact){
+        int index= -1;
         if (contactExist(contact.getId())){
-
+            for (Contact c : contacts){
+                if ((c.getId()).equals(contact.getId())){     // contact found
+                    contacts.remove(c);
+                    return true;
+                }
+                else        // contact not in list, and can not be removed
+                    return false;
+            }
             return true;   // if the ArrayList is empty no contact to remove
         }
         return false;   // contact is not in the ArrayList
@@ -53,6 +61,7 @@ public class Controller {
         Boolean success;
         SaveNLoader load = new SaveNLoader();
         success = load.load(contacts);
+        System.out.println("load contacts 2 ok " + contacts.toString() + " " + success);
         return success;
     }
 
@@ -60,6 +69,7 @@ public class Controller {
         Boolean success;
         SaveNLoader save = new SaveNLoader();
         success = save.save(contacts);
+        System.out.println("save contacts 2 ok " + contacts.toString() + " " + success);
         return success;
     }
 }

@@ -1,13 +1,15 @@
 package sample;
 
-public class Contact {
+import java.io.Serializable;
+
+public class Contact implements Serializable{
 
     private String firstName = " ";
     private String lastName = " ";
     private String id =" ";
     private String phoneNumber = " ";
 
-    public Contact(){
+    public Contact() {
         this.firstName = " ";
         this.lastName = " ";
         this.id = " ";

@@ -220,10 +220,12 @@ public class MainView {
                             if (!success){
                                 list.clear();       // clear then update of the ListView for feedback to the user
                                 list.add("Error: the list of contacts couldn't be saved");
+                                System.out.println("save contacts NOT ok ");
                             }
                             else {
                                 list.clear();       // clear then update of the ListView for feedback to the user
                                 list.add("The list of contacts has been saved");
+                                System.out.println("contacts saved before exit ");
                             }
                             System.exit(0);
                         });
